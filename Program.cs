@@ -12,10 +12,10 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<SQLiteDBContext>(options =>
 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-// Identity services
+// Identity services   (uid:sibusiso)
 builder.Services.AddDbContext<LoginDBContext>(options =>
 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-// Identity configuration
+// Identity configuration  (uid:sibusiso)
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<LoginDBContext>();
@@ -44,13 +44,13 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapRazorPages(); // Map Razor Pages for Identity
+app.MapRazorPages(); // Map Razor Pages for Identity (uid:sibusiso)
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// Seed roles and admin user
+// Seed roles and admin user  (uid:sibusiso)
 using (var scope = app.Services.CreateScope())
 {
     var roleManager =
@@ -66,6 +66,7 @@ using (var scope = app.Services.CreateScope())
 
 }
 
+// Seed user manager  (uid:sibusiso)
 using (var scope = app.Services.CreateScope())
 {
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
