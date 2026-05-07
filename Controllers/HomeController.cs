@@ -2,12 +2,17 @@
 using ASPNETCore_DB.Interfaces;
 using ASPNETCore_DB.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
+using System.Diagnostics;//start
+using Microsoft.AspNetCore.Authorization;//end 
 
 namespace ASPNETCore_DB.Controllers
 {
+    //start
+    [Authorize]
+    [TypeFilter(typeof(CustomExceptionFilter))]//end
     public class HomeController : Controller
     {
+        
         private readonly ILogger<HomeController> _logger;
         private readonly SQLiteDBContext _context;
         private readonly IDBInitializer _seedDatabase;

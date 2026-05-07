@@ -1,11 +1,15 @@
 ﻿using ASPNETCore_DB.Interfaces;
 using ASPNETCore_DB.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 
 namespace ASPNETCore_DB.Controllers
 {
+    //start
+    [Authorize]//end
     [TypeFilter(typeof(CustomExceptionFilter))]
     public class StudentController : Controller
     {
@@ -27,6 +31,9 @@ namespace ASPNETCore_DB.Controllers
             }
             
         }
+
+        //start
+        [Authorize(Roles = "Admin")]//end
         public IActionResult Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
         {
             pageNumber = pageNumber ?? 1;
@@ -77,6 +84,8 @@ namespace ASPNETCore_DB.Controllers
             return viewDetail;
         }
 
+        //start
+        [Authorize(Roles = "User")]//end
         [HttpGet]
         public IActionResult Create()
         {
@@ -86,6 +95,8 @@ namespace ASPNETCore_DB.Controllers
             return View(student);
         }
 
+        //start
+        [Authorize(Roles = "User")]//end
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create([Bind("StudentNumber, FirstName, Surname, EnrollmentDate")] Student student)
@@ -118,6 +129,8 @@ namespace ASPNETCore_DB.Controllers
             return RedirectToAction(nameof(Details), new { id = student.StudentNumber });
         }
 
+        //start
+        [Authorize(Roles = "User")]//end
         [HttpGet]
         public IActionResult Edit(string id)
         {
@@ -133,6 +146,8 @@ namespace ASPNETCore_DB.Controllers
             return viewDetail;
         }
 
+        //start
+        [Authorize(Roles = "User")]//end
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Student student)
@@ -164,6 +179,8 @@ namespace ASPNETCore_DB.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        //start
+        [Authorize(Roles = "Admin")]//end
         [HttpGet]
         public IActionResult Delete(string id)
         {
@@ -179,6 +196,8 @@ namespace ASPNETCore_DB.Controllers
             return viewDetail;
         }
 
+        //start
+        [Authorize(Roles = "Admin")]//end
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete([Bind("StudentNumber, FirstName, Surname, EnrollmentDate")] Student student)
