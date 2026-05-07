@@ -190,8 +190,8 @@ namespace ASPNETCore_DB.Controllers
             {
                 throw new Exception("Student could not be deleted");
             }
-            
-            return RedirectToAction(nameof(Index));
+
+            return RedirectToAction(nameof(Details), new { id = student.StudentNumber });
         }
 
 
