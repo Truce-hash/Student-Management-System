@@ -1,12 +1,13 @@
 ﻿using ASPNETCore_DB.Interfaces;
 using ASPNETCore_DB.Models;
-using Microsoft.AspNetCore.Authorization;  // line added
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 
 namespace ASPNETCore_DB.Controllers
 {
+    //start
+    [Authorize]//end
     [TypeFilter(typeof(CustomExceptionFilter))]
     public class StudentController : Controller
     {
@@ -28,7 +29,6 @@ namespace ASPNETCore_DB.Controllers
             }
             
         }
-        [Authorize(Roles = "Admin")]// line added
         public IActionResult Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
         {
             pageNumber = pageNumber ?? 1;
@@ -92,7 +92,7 @@ namespace ASPNETCore_DB.Controllers
 
             return viewDetail;*/
         }
-        [Authorize(Roles = "User")]// line added
+
         [HttpGet]
         public IActionResult Create()
         {
@@ -108,7 +108,7 @@ namespace ASPNETCore_DB.Controllers
             student.Photo = fileName;
             return View(student);
         }
-        [Authorize(Roles = "User")] // line added
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create([Bind("StudentNumber, FirstName, Surname, EnrollmentDate")] Student student)
@@ -137,21 +137,9 @@ namespace ASPNETCore_DB.Controllers
             {
                 throw new Exception("Student could not be created");
             }
-            //added existing student
-            var studentsExist = _studentRepo.ByEmail(this.User.Identity.Name.ToString());
-
-            if (studentsExist != null)
-            {
-
-                return RedirectToAction("Details","Student", new { id = studentsExist.StudentNumber });
-            }
-            else
-            {
-                return RedirectToAction("Create");
-            }
-                
+            return RedirectToAction(nameof(Index));
         }
-        [Authorize(Roles = "User")] // line added by Cruz
+
         [HttpGet]
         public IActionResult Edit(string id)
         {
@@ -166,7 +154,7 @@ namespace ASPNETCore_DB.Controllers
             }
             return viewDetail;
         }
-        [Authorize(Roles = "User")]// line added by Cruz
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Student student)
@@ -197,7 +185,7 @@ namespace ASPNETCore_DB.Controllers
             
             return RedirectToAction(nameof(Index));
         }
-        [Authorize(Roles = "Admin")] //line added
+
         [HttpGet]
         public IActionResult Delete(string id)
         {
@@ -212,7 +200,7 @@ namespace ASPNETCore_DB.Controllers
             }
             return viewDetail;
         }
-        [Authorize(Roles = "Admin")] // only added this line
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete([Bind("StudentNumber, FirstName, Surname, EnrollmentDate")] Student student)
@@ -226,7 +214,7 @@ namespace ASPNETCore_DB.Controllers
                 throw new Exception("Student could not be deleted");
             }
 
-            return RedirectToAction(nameof(Details), new { id = student.StudentNumber });
+            return RedirectToAction(nameof(Index));
         }
 
 
