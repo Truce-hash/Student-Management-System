@@ -114,7 +114,8 @@ namespace ASPNETCore_DB.Controllers
             {
                 throw new Exception("Student could not be created");
             }
-            return RedirectToAction(nameof(Index));
+            <!
+            return RedirectToAction(nameof(Details), new { id = student.StudentNumber });
         }
 
         [HttpGet]
@@ -191,7 +192,7 @@ namespace ASPNETCore_DB.Controllers
                 throw new Exception("Student could not be deleted");
             }
 
-            return RedirectToAction(nameof(Details), new { id = student.StudentNumber });
+            return RedirectToAction(nameof(Index));
         }
 
 
