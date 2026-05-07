@@ -1,5 +1,6 @@
 ﻿using ASPNETCore_DB.Interfaces;
 using ASPNETCore_DB.Models;
+using Microsoft.AspNetCore.Authorization;  // line added
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,7 @@ namespace ASPNETCore_DB.Controllers
             }
             
         }
+        [Authorize(Roles = "Admin")]// line added
         public IActionResult Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
         {
             pageNumber = pageNumber ?? 1;
@@ -61,9 +63,23 @@ namespace ASPNETCore_DB.Controllers
                         
             return viewResult;
         }
+        
         public IActionResult Details(string id)
         {
-            ViewResult viewDetail = View();
+            //added this if and else by Cruz
+            if (string.IsNullOrEmpty(id))  
+            {
+
+                var student = _studentRepo.ByEmail(this.User.Identity.Name.ToString());
+                return View(student);
+            }
+            else
+            {
+
+                var student = _studentRepo.Details(id);
+                return View(student);
+            }
+             /*  ViewResult viewDetail = View();
             try
             {
                 viewDetail = View(_studentRepo.Details(id));
@@ -74,18 +90,25 @@ namespace ASPNETCore_DB.Controllers
             }
 
 
-            return viewDetail;
+            return viewDetail;*/
         }
-
+        [Authorize(Roles = "User")]// line added
         [HttpGet]
         public IActionResult Create()
         {
+            //existing student
+            var studentExist = _studentRepo.ByEmail(this.User.Identity.Name.ToString());
+
+            if (studentExist != null)
+            {
+                return RedirectToAction("Details", "Student", studentExist.StudentNumber);
+            }//added this if from that existing Cruz
             Student student = new Student();
             string fileName = "DefaultPic.png";
             student.Photo = fileName;
             return View(student);
         }
-
+        [Authorize(Roles = "User")] // line added
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create([Bind("StudentNumber, FirstName, Surname, EnrollmentDate")] Student student)
@@ -114,9 +137,21 @@ namespace ASPNETCore_DB.Controllers
             {
                 throw new Exception("Student could not be created");
             }
-            return RedirectToAction(nameof(Index));
-        }
+            //added existing student
+            var studentsExist = _studentRepo.ByEmail(this.User.Identity.Name.ToString());
 
+            if (studentsExist != null)
+            {
+
+                return RedirectToAction("Details","Student", new { id = studentsExist.StudentNumber });
+            }
+            else
+            {
+                return RedirectToAction("Create");
+            }
+                
+        }
+        [Authorize(Roles = "User")] // line added by Cruz
         [HttpGet]
         public IActionResult Edit(string id)
         {
@@ -131,7 +166,7 @@ namespace ASPNETCore_DB.Controllers
             }
             return viewDetail;
         }
-
+        [Authorize(Roles = "User")]// line added by Cruz
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Student student)
@@ -162,7 +197,7 @@ namespace ASPNETCore_DB.Controllers
             
             return RedirectToAction(nameof(Index));
         }
-
+        [Authorize(Roles = "Admin")] //line added
         [HttpGet]
         public IActionResult Delete(string id)
         {
@@ -177,7 +212,7 @@ namespace ASPNETCore_DB.Controllers
             }
             return viewDetail;
         }
-
+        [Authorize(Roles = "Admin")] // only added this line
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete([Bind("StudentNumber, FirstName, Surname, EnrollmentDate")] Student student)
