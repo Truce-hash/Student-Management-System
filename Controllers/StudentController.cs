@@ -114,7 +114,7 @@ namespace ASPNETCore_DB.Controllers
             {
                 throw new Exception("Student could not be created");
             }
-            <!
+            
             return RedirectToAction(nameof(Details), new { id = student.StudentNumber });
         }
 
