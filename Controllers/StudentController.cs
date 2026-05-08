@@ -2,7 +2,6 @@
 using ASPNETCore_DB.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 
 namespace ASPNETCore_DB.Controllers
@@ -11,9 +10,9 @@ namespace ASPNETCore_DB.Controllers
     public class StudentController : Controller
     {
         private readonly IStudent _studentRepo;
-        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly Microsoft.AspNetCore.Hosting.IWebHostEnvironment _webHostEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public StudentController(IStudent studentRepo, IWebHostEnvironment webHostEnvironment, IHttpContextAccessor httpContextAccessor)
+        public StudentController(IStudent studentRepo, Microsoft.AspNetCore.Hosting.IWebHostEnvironment webHostEnvironment, IHttpContextAccessor httpContextAccessor)
         {
             try
             {
@@ -81,7 +80,7 @@ namespace ASPNETCore_DB.Controllers
                 return View(student);
             }
 
-               /*ViewResult viewDetail = View();
+               ViewResult viewDetail = View();
             try
             {
                 viewDetail = View(_studentRepo.Details(id));
@@ -92,7 +91,7 @@ namespace ASPNETCore_DB.Controllers
             }
 
 
-            return viewDetail;*/
+            return viewDetail;
         }
 
         [Authorize(Roles = "User")]
@@ -118,7 +117,7 @@ namespace ASPNETCore_DB.Controllers
         [Authorize(Roles = "User")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(/*[Bind("StudentNumber, FirstName, Surname, EnrollmentDate")]*/ Student student)
+        public IActionResult Create( Student student)
  {
             var files = HttpContext.Request.Form.Files;//Handles the file upload from the form
             string webRootPath = _webHostEnvironment.WebRootPath;//Gets the wwwroot path of the project
@@ -180,30 +179,43 @@ namespace ASPNETCore_DB.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(string photoName, Student student)
         {
-            var files = HttpContext.Request.Form.Files;//Handles the file upload from the form
-            string webRootPath = _webHostEnvironment.WebRootPath;//Gets the wwwroot path of the project
-            string upload = webRootPath + WebConstants.ImagePath;//Combines the wwwroot path with the image path defined in WebConstants to get the full path for uploading images
-            string fileName = Guid.NewGuid().ToString();//Generates a unique file name using a GUID to avoid conflicts with existing files
-            string extension = Path.GetExtension(files[0].FileName);//Gets the file extension of the uploaded file
-
-            using (var fileStream = new FileStream(Path.Combine(upload, fileName + extension), FileMode.Create))
+            if (HttpContext.Request.Form.Count > 0)
             {
-                files[0].CopyTo(fileStream);
-            }
-                student.Photo = fileName + extension;            
+                var files = HttpContext.Request.Form.Files;//Handles the file upload from the form
+                string webRootPath = _webHostEnvironment.WebRootPath;//Gets the wwwroot path of the project
+                string upload = webRootPath + WebConstants.ImagePath;//Combines the wwwroot path with the image path defined in WebConstants to get the full path for uploading images
+                string fileName = Guid.NewGuid().ToString();//Generates a unique file name using a GUID to avoid conflicts with existing files
+                string extension = Path.GetExtension(files[0].FileName);//Gets the file extension of the uploaded file
 
-            try
-            {
-                if (ModelState.IsValid)
+                var oldFile = Path.Combine(upload, photoName);
+
+                if (System.IO.File.Exists(oldFile))
                 {
-                    _studentRepo.Edit(student);
+                    System.IO.File.Delete(oldFile);
                 }
+
+                using (var fileStream = new FileStream(Path.Combine(upload, fileName + extension), FileMode.Create))
+                {
+                    files[0].CopyTo(fileStream);
+                }
+                student.Photo = fileName + extension;
             }
-            catch (Exception ex)
-            {
-                throw new Exception("Student detail could not be edited");
+            else {
+                student.Photo = photoName;
             }
-            
+
+                try
+                {
+                    if (ModelState.IsValid)
+                    {
+                        _studentRepo.Edit(student);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Student detail could not be edited");
+                }
+                        
             return RedirectToAction(nameof(Index));
         }
 
