@@ -80,7 +80,8 @@ namespace ASPNETCore_DB.Controllers
                 var student = _studentRepo.Details(id);
                 return View(student);
             }
-             /*  ViewResult viewDetail = View();
+
+               /*ViewResult viewDetail = View();
             try
             {
                 viewDetail = View(_studentRepo.Details(id));
@@ -94,6 +95,7 @@ namespace ASPNETCore_DB.Controllers
             return viewDetail;*/
         }
 
+        [Authorize(Roles = "User")]
         [HttpGet]
         public IActionResult Create()
         {
@@ -104,15 +106,19 @@ namespace ASPNETCore_DB.Controllers
             {
                 return RedirectToAction("Details", "Student", studentExist.StudentNumber);
             }//added this if from that existing Cruz
-            Student student = new Student();
-            string fileName = "DefaultPic.png";
-            student.Photo = fileName;
-            return View(student);
+            else
+            {
+                Student student = new Student();
+                string fileName = "DefaultPic.png";
+                student.Photo = fileName;
+                return View(student);
+            }
         }
 
+        [Authorize(Roles = "User")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("StudentNumber, FirstName, Surname, EnrollmentDate")] Student student)
+        public IActionResult Create(/*[Bind("StudentNumber, FirstName, Surname, EnrollmentDate")]*/ Student student)
  {
             var files = HttpContext.Request.Form.Files;//Handles the file upload from the form
             string webRootPath = _webHostEnvironment.WebRootPath;//Gets the wwwroot path of the project
@@ -138,9 +144,22 @@ namespace ASPNETCore_DB.Controllers
             {
                 throw new Exception("Student could not be created");
             }
-            return RedirectToAction(nameof(Index));
+
+            //existing student
+            var studentExist = _studentRepo.ByEmail(this.User.Identity.Name.ToString());
+            if (studentExist != null)
+            {
+                return RedirectToAction("Details", "Student", new { id = studentExist.StudentNumber });
+            }
+            else
+            {
+                return RedirectToAction("Create");
+            }
+               
         }
 
+
+        [Authorize(Roles = "User")]
         [HttpGet]
         public IActionResult Edit(string id)
         {
@@ -156,9 +175,10 @@ namespace ASPNETCore_DB.Controllers
             return viewDetail;
         }
 
+        [Authorize (Roles = "User")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Student student)
+        public IActionResult Edit(string photoName, Student student)
         {
             var files = HttpContext.Request.Form.Files;//Handles the file upload from the form
             string webRootPath = _webHostEnvironment.WebRootPath;//Gets the wwwroot path of the project
@@ -187,6 +207,7 @@ namespace ASPNETCore_DB.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult Delete(string id)
         {
@@ -202,9 +223,10 @@ namespace ASPNETCore_DB.Controllers
             return viewDetail;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete([Bind("StudentNumber, FirstName, Surname, EnrollmentDate")] Student student)
+        public IActionResult Delete(/*[Bind("StudentNumber, FirstName, Surname, EnrollmentDate")]*/ Student student)
         {
             try 
             {

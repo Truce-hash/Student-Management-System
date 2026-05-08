@@ -8,7 +8,7 @@ namespace ASPNETCore_DB.Interfaces
         Student Details(string id);
         Student ByEmail(string id); //added by Cruz to ref to the Create httppost in studcontroller
         Student Create(Student student);
-        Student Edit(Student student);
+        Student Edit(Student student);     
         bool Delete(Student student);
         bool IsExist(string id);
     }

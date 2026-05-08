@@ -3,7 +3,9 @@ using ASPNETCore_DB.Interfaces;
 using ASPNETCore_DB.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;//start
-using Microsoft.AspNetCore.Authorization;//end 
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;//end 
+
 
 namespace ASPNETCore_DB.Controllers
 {
@@ -16,16 +18,29 @@ namespace ASPNETCore_DB.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly SQLiteDBContext _context;
         private readonly IDBInitializer _seedDatabase;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public HomeController(ILogger<HomeController> logger, SQLiteDBContext context, IDBInitializer seedDatabase)
+        public HomeController(ILogger<HomeController> logger, SQLiteDBContext context, IDBInitializer seedDatabase, UserManager<IdentityUser> userManager)
         {
             _logger = logger;
             _context = context;
             _seedDatabase = seedDatabase;
+            _userManager = userManager;
         }
 
         public IActionResult Index()
         {
+            ViewData["UserID"] = _userManager.GetUserId(this.User);
+            ViewData["UserName"] = _userManager.GetUserName(this.User);
+
+            if (this.User.IsInRole("Admin"))
+            {
+                ViewData["UserRole"] = "Admin";
+            }
+            if (this.User.IsInRole("User"))
+            {
+                ViewData["UserRole"] = "User";
+            }
             return View();
         }
 
