@@ -144,6 +144,7 @@ namespace ASPNETCore_DB.Controllers
             {
                 throw new Exception("Student could not be created");
             }
+<<<<<<< HEAD
 
             //existing student
             var studentExist = _studentRepo.ByEmail(this.User.Identity.Name.ToString());
@@ -156,6 +157,9 @@ namespace ASPNETCore_DB.Controllers
                 return RedirectToAction("Create");
             }
                
+=======
+            return RedirectToAction(nameof(Details), new { id = student.StudentNumber });
+>>>>>>> 871809703bdaa937586765ba000592f34a796b04
         }
 
 
