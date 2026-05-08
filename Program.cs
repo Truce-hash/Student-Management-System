@@ -23,6 +23,9 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 builder.Services.AddScoped<IExceptionFilter, CustomExceptionFilter>();
 builder.Services.AddScoped<IDBInitializer, DBInitializerRepo>();
 builder.Services.AddScoped<IStudent, StudentRepo>();
+
+builder.Services.AddRazorPages();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -42,6 +45,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages(); // Map Razor Pages for Identity (uid:sibusiso)

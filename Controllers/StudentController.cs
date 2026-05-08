@@ -1,13 +1,12 @@
 ﻿using ASPNETCore_DB.Interfaces;
 using ASPNETCore_DB.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 
 namespace ASPNETCore_DB.Controllers
 {
-    //start
-    [Authorize]//end
     [TypeFilter(typeof(CustomExceptionFilter))]
     public class StudentController : Controller
     {
@@ -29,6 +28,8 @@ namespace ASPNETCore_DB.Controllers
             }
             
         }
+
+        [Authorize(Roles = "Admin")]
         public IActionResult Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
         {
             pageNumber = pageNumber ?? 1;
