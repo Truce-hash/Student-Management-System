@@ -1,6 +1,6 @@
-# SOD316C Student Management System
+# Student Management System
 
-An ASP.NET Core MVC student-management application developed for the SOD316C project. The application provides a database-backed interface for managing student records and demonstrates authentication and role-based authorization with ASP.NET Core Identity.
+An ASP.NET Core MVC student-management application. The application provides a database-backed interface for managing student records and demonstrates authentication and role-based authorization with ASP.NET Core Identity.
 
 ## Features
 
